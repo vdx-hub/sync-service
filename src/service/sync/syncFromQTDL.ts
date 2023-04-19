@@ -1,4 +1,4 @@
-import { pullCollection, pushRecord } from './sync'
+import { pullCollection, pushRecord, pushOneCollection } from './sync'
 const ENDPOINT_QTDL = `http://api.ceid.gov.vn:8000`
 const ENDPOINTSOURCE_QTDL = `quantridulieu`
 const SERVICE_USERNAME = 'apiSync'
@@ -37,4 +37,13 @@ export const pushRecordToQTDL = async ({ collection, record, SOURCEREF }) => awa
   apiKey: APIKEY,
   collection,
   record
+})
+export const pushCollectionToQTDL = async ({ client, db, collection, SOURCEREF }) => pushOneCollection({
+  client,
+  db,
+  SOURCEREF,
+  endpoint: ENDPOINT_QTDL,
+  endpointSource: ENDPOINTSOURCE_QTDL,
+  apiKey: APIKEY,
+  collection,
 })

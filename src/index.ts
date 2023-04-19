@@ -4,6 +4,7 @@ import https from 'https';
 import express from 'express';
 
 import syncRouter from "@routes/sync";
+import pushRouter from "@routes/push";
 
 
 https.globalAgent.options.rejectUnauthorized = false;
@@ -27,6 +28,7 @@ app.use((err: any, _req: any, res: any, _next: any) => {
   });
 });
 app.use('/sync', syncRouter)
+app.use('/push', pushRouter)
 app.listen(process.env.PORT, async () => {
   console.log(`Server is up! http://0.0.0.0:${process.env.PORT}`);
 })

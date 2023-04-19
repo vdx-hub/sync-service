@@ -10,7 +10,7 @@ function setTimeZoneOffset(dateAt: any) {
   return timeZoneCorrection.toISOString().split('.')[0] + "Z";
 }
 
-async function getFirstTimeSync({ client, db, collection }) {
+async function getLastTimeSyncCollection({ client, db, collection }) {
   const lastSyncData = await client.db(db).collection(collection).find({ "syncAt": { $exists: true } }).sort({
     syncAt: -1
   }).limit(1).toArray();
@@ -262,7 +262,7 @@ export async function pullCollection({ endpoint, endpointSource, apiKey, client,
   }
 
   // Per collection run
-  let lastsyncRecord = await getFirstTimeSync({ client, db, collection });
+  let lastsyncRecord = await getLastTimeSyncCollection({ client, db, collection });
   const GET_RECORD_FROM = lastsyncRecord?.syncAtStr || '';
 
   let resumptionToken = 0;
@@ -399,13 +399,59 @@ export async function pushRecord({ endpoint, endpointSource, apiKey, collection,
   return await axios(configPost)
     .then(function (response) {
       if (response?.data?.data) {
+        console.log('record pushed', record._id);
         return response?.data?.data;
       }
       else {
-        console.log(`${endpoint}${collection}/update`, response.status);
+        console.log('record update', record._id, `${endpoint} ${collection}/update`, response?.data);
       }
     })
     .catch(function (error) {
       console.log('error', error);
     });
+}
+
+export async function pushOneCollection({
+  client,
+  db,
+  endpoint,
+  endpointSource,
+  apiKey,
+  collection,
+  SOURCEREF
+}) {
+  console.log('pushOneCollection', db, collection);
+
+  const pushTime = new Date().getTime();
+  const pushTimeStr = setTimeZoneOffset(pushTime);
+
+  let lastSyncTime = await getLastTimeSyncCollection({ client, db, collection });
+  const ketQuaPush = {};
+
+  const cursor = client.db(db).collection(collection).find({
+    $and: [
+      { "storage": "regular" },
+      ...lastSyncTime?.last_asyncAt ? [{
+        "modifiedAt": { $gt: lastSyncTime?.last_asyncAt }
+      }] : []]
+  })
+
+  while (await cursor.hasNext()) {
+    let doc: any = await cursor.next();
+    if (doc._id) {
+      ketQuaPush[doc._id] = []
+      ketQuaPush[doc._id] = await pushRecord({ endpoint, endpointSource, apiKey, collection, record: doc, SOURCEREF })
+    }
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+  await client.db(db).collection('vuejx_collection').updateOne({
+    shortName: collection
+  }, {
+    $set: {
+      last_pushAt: pushTime,
+      last_pushAtStr: pushTimeStr,
+    }
+  });
+  return ketQuaPush;
 }
