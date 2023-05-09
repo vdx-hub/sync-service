@@ -1,7 +1,7 @@
 import { _client } from '@db/mongodb';
 import express from 'express';
 import { verify } from 'service/auth/jwt';
-import { pushCollectionToQTDL } from 'service/sync/syncFromQTDL';
+import { pushCollectionToQTDL } from 'service/sync/syncWithQTDL';
 const router = express.Router();
 
 router.post('/:collection/start', async function (req, res) {

@@ -1,7 +1,7 @@
 import { _client } from '@db/mongodb';
 import express from 'express';
 import { verify } from 'service/auth/jwt';
-import { pullCollectionFromQTDL } from 'service/sync/syncFromQTDL';
+import { pullCollectionFromQTDL } from 'service/sync/syncWithQTDL';
 const router = express.Router();
 
 router.post('/ping', async function (_req, res) {

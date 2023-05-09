@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import { transformPullRecord, transformPushRecord } from "service/mapping";
 // import { reindexByIdX, q } from "../../index";
 
 
@@ -137,85 +138,6 @@ export async function upsertOne({ client, db, collection, filter, data, isUpsert
   }, { upsert: isUpsert });
 }
 
-function transformRecord(collection: string, record: any) {
-  let mappedRecord = {};
-  mappedRecord['metadata.NguonThamChieu.MaThamChieu'] = record?.metadata?.NguonThamChieu?.MaThamChieu || record?.sourceRefId;
-  mappedRecord['metadata.NguonThamChieu.MaNguonDuLieu'] = record?.metadata?.NguonThamChieu?.NguonDuLieu || record?.sourceRef;
-  mappedRecord['storage'] = record?.storage;
-  mappedRecord['type'] = record?.type;
-  if (collection === "T_ChuDauTu") {
-    if (record['MaDinhDanh']) {
-      mappedRecord['MaDinhDanh'] = record['MaDinhDanh'];
-    }
-    mappedRecord['TenGoi'] = record['TenGoi'];
-    mappedRecord['DiaChi'] = record['DiaChi'];
-    mappedRecord['DangKyKinhDoanh._source'] = record['GiayToChungNhan'];
-    mappedRecord['MaSoThue'] = record['MaSoThue'];
-    mappedRecord['NguoiDaiDien'] = record['NguoiDaiDien'];
-    mappedRecord['DanhBaLienLac'] = record['DanhBaLienLac'];
-  }
-  else if (collection === "T_GiayPhepMoiTruong") {
-    if (record['MaDinhDanh']) {
-      mappedRecord['MaDinhDanh'] = record['MaDinhDanh'];
-    }
-    mappedRecord['LoaiGiayPhepMoiTruong'] = record['LoaiGiayPhepMoiTruong'];
-    mappedRecord['SoHieuVanBan'] = record['SoHieuVanBan'];
-    mappedRecord['NgayBanHanh'] = record['NgayBanHanh'];
-    mappedRecord['NgayHetHan'] = record['NgayHetHan'];
-    mappedRecord['CoQuanBanHanh'] = record['CoQuanBanHanh'];
-    mappedRecord['ChuDauTu._source.DiaChi'] = record?.ChuDauTu?._source?.DiaChi;
-    mappedRecord['ChuDauTu._source.MaDinhDanh'] = record?.ChuDauTu?._source?.MaDinhDanh;
-    mappedRecord['ChuDauTu._source.TenGoi'] = record?.ChuDauTu?._source?.TenGoi;
-    mappedRecord['ChuDauTu._source.DangKyKinhDoanh._source.SoGiay'] = record?.ChuDauTu?._source?.GiayToChungNhan?.SoGiay;
-    mappedRecord['ChuDauTu._source.DangKyKinhDoanh._source.NoiCap'] = record?.ChuDauTu?._source?.GiayToChungNhan?.NoiCap;
-    mappedRecord['ChuDauTu._source.DangKyKinhDoanh._source.NgayCap'] = record?.ChuDauTu?._source?.GiayToChungNhan?.NgayCap;
-    mappedRecord['ChuDauTu._source.DangKyKinhDoanh._source.NoiCap'] = record?.ChuDauTu?._source?.GiayToChungNhan?.NoiCap;
-    mappedRecord['ChuDauTu._source.MaSoThue'] = record?.ChuDauTu?._source?.MaSoThue;
-    mappedRecord['ChuDauTu._source.NguoiDaiDien'] = record?.ChuDauTu?._source?.NguoiDaiDien;
-    mappedRecord['MoiTruongCoSo._source.MaDinhDanh'] = record?.MoiTruongCoSo?._source?.MaDinhDanh;
-    mappedRecord['MoiTruongCoSo._source.TenGoi'] = record?.MoiTruongCoSo?._source?.TenGoi;
-    mappedRecord['MoiTruongCoSo._source.DiaChi'] = record?.MoiTruongCoSo?._source?.DiaChi;
-  }
-  else if (collection === "T_MoiTruongCoSo") {
-    if (record['MaDinhDanh']) {
-      mappedRecord['MaDinhDanh'] = record['MaDinhDanh'];
-    }
-    mappedRecord['LoaiHinhCoSo'] = record['LoaiHinhCoSo'];
-    mappedRecord['TenGoi'] = record['TenGoi'];
-    mappedRecord['DiaChi'] = record['DiaChi'];
-    mappedRecord['TrongKhuTapTrung'] = record['TrongKhuTapTrung'];
-    mappedRecord['ChuDauTu._source.MaDinhDanh'] = record?.ChuDauTu?._source?.MaDinhDanh;
-    mappedRecord['ChuDauTu._source.TenGoi'] = record?.ChuDauTu?._source?.TenGoi;
-    mappedRecord['ChuDauTu._source.DiaChi'] = record?.ChuDauTu?._source?.DiaChi;
-    mappedRecord['CapQuanLy'] = record?.CapQuanLy;
-    mappedRecord['NganhNgheKinhDoanh'] = record?.LoaiNganhNgheKinhTe;
-    mappedRecord['NhienLieuTieuThu'] = record?.NhienLieuSuDung;
-    mappedRecord['PhanLoaiNguonThai'] = record?.PhanLoaiNguonThai;
-  }
-  else if (collection === "T_DonViDVQTMT") {
-    if (record['MaDinhDanh']) {
-      mappedRecord['MaDinhDanh'] = record['MaDinhDanh'];
-    }
-    mappedRecord['TenGoi'] = record?.['TenGoi'];
-    mappedRecord['DiaChi'] = record?.['DiaChi'];
-    mappedRecord['Vimcerts'] = record?.['Vimcerts'];
-    mappedRecord['LinhVucPhamViQTMT'] = record?.['LinhVucPhamViQTMT'];
-    mappedRecord['TinhTrangHoatDong'] = record?.['TinhTrangHoatDong'];
-  }
-  else if (collection == 'T_CanBo') {
-    let keyToGet = ["MaDinhDanh", "MaSoThue", "MaBHXH", "TenGoi", "HoVaTen", "BiDanh", "NgaySinh", "NgaySinh___Nam", "NgaySinh___Thang", "NgaySinh___Ngay", "GioiTinh", "NoiSinh", "QueQuan", "DanToc", "TonGiao", "QuocTich", "NhomMau", "DiaChiThuongTru", "NoiOHienTai", "DanhBaLienLac", "TinhTrangHonNhan", "TinhTrangSinhSong", "AnhCaNhan", "MaSoCanBo", "NgayTuyenDung", "CoQuanTuyenDung", "NoiCongTac", "CoQuanChuQuan", "DoiTuongCanBo", "TrinhDoChuyenMon", "ChucDanhNgheNghiep", "ChucVuCapBac", "TinhTrangCongTac", "NgayThoiViec", "pendingActivateSSOUser", "sourceRef", "sourceRefId", "TaiKhoanDienTu", "TrangThaiSSO", "userSSO", "pendingActivateSSOUser"];
-    for (let key of keyToGet) {
-      if (record[key]) {
-        mappedRecord[key] = record[key]
-      }
-      else {
-        mappedRecord[key] = null;
-      }
-    }
-  }
-  return mappedRecord;
-}
-
 async function saveSyncData({ client, db, collection, filter, record, isUpsert, SOURCEREF, SERVICE_USERNAME, customMetadata }, getResponse?: boolean) {
   let ketQua: any = {}
   let { result, connection, message, ...response } = await upsertOne({
@@ -286,7 +208,7 @@ export async function pullCollection({ endpoint, endpointSource, apiKey, client,
             });
           }
           else if (collection.startsWith('T_')) {
-            let mappedRecord: any = transformRecord(collection, record);
+            let mappedRecord: any = transformPullRecord(collection, record);
             if (!mappedRecord.MaDinhDanh) {
               continue;
             }
@@ -382,6 +304,7 @@ export async function pullCollection({ endpoint, endpointSource, apiKey, client,
 
 export async function pushRecord({ endpoint, endpointSource, apiKey, collection, record, SOURCEREF }) {
   const tokenApi = await getTokenApi(endpoint, endpointSource, apiKey);
+  let transformedRecord: any = transformPushRecord(collection, record)
   let configPost = {
     method: "post",
     url: `${endpoint}/CSDL/${endpointSource}/${collection}/update`, //`${endpoint}/update`,
@@ -392,7 +315,7 @@ export async function pushRecord({ endpoint, endpointSource, apiKey, collection,
       'key': apiKey
     },
     data: JSON.stringify({
-      ...record,
+      ...transformedRecord,
       sourceRef: SOURCEREF
     }),
   };
