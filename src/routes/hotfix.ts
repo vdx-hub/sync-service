@@ -1,14 +1,14 @@
 import { _client } from '@db/mongodb';
 import express from 'express';
 import { verify } from 'service/auth/jwt';
-import { pullCollectionFromQTDL } from 'service/sync/syncWithQTDL';
+import { fixDiaChi } from 'service/hotfix/S_DiaChi';
 const router = express.Router();
 
 router.post('/ping', async function (_req, res) {
-  res.status(200).send("Service sync up and running!")
+  res.status(200).send("Service hotfix up and running!")
 })
 
-router.post('/:collection/start', async function (req, res) {
+router.post('/:collection/fixDiaChi', async function (req, res) {
   let body = req?.body
   let param = req.params
   const authStatus = await verify(body.token);
@@ -16,11 +16,9 @@ router.post('/:collection/start', async function (req, res) {
     res.send(authStatus)
     return;
   }
-  let kq = await pullCollectionFromQTDL({
-    client: _client,
-    db: 'CSDL_Ceid',
-    collection: param?.collection,
-    SOURCEREF: 'TULIEU'
+  let kq = await fixDiaChi({
+    collection: param.collection,
+    key: body?.key
   })
   res.status(200).send(kq)
 })

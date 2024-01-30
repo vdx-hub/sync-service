@@ -5,6 +5,8 @@ import express from 'express';
 
 import syncRouter from "@routes/sync";
 import pushRouter from "@routes/push";
+import hotfixRouter from "@routes/hotfix";
+import countRouter from "@routes/count";
 
 
 https.globalAgent.options.rejectUnauthorized = false;
@@ -29,6 +31,8 @@ app.use((err: any, _req: any, res: any, _next: any) => {
 });
 app.use('/sync', syncRouter)
 app.use('/push', pushRouter)
+app.use('/hotfix', hotfixRouter)
+app.use('/count', countRouter)
 app.listen(process.env.PORT, async () => {
   console.log(`Server is up! http://0.0.0.0:${process.env.PORT}`);
 })

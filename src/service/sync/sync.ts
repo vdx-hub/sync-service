@@ -327,6 +327,10 @@ export async function pushRecord({ endpoint, endpointSource, apiKey, collection,
       }
       else {
         console.log('record update', record._id, `${endpoint} ${collection}/update`, response?.data);
+        return {
+          endpoint: `${endpoint}/CSDL/${endpointSource}/${collection}/update`,
+          data: response?.data
+        }
       }
     })
     .catch(function (error) {
