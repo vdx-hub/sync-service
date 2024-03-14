@@ -1,5 +1,3 @@
-import { _client } from '@db/mongodb';
-import axios from 'axios';
 import express from 'express';
 import { verify } from 'service/auth/jwt';
 const router = express.Router();

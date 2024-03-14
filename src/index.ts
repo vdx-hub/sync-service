@@ -6,8 +6,11 @@ import express from 'express';
 import syncRouter from "@routes/sync";
 import pushRouter from "@routes/push";
 import hotfixRouter from "@routes/hotfix";
+import removeFieldsRouter from "@routes/remove_field";
 import countRouter from "@routes/count";
 import signRouter from "@routes/sign";
+import mailRouter from "@routes/mail";
+import { ensureDir } from 'fs-extra';
 
 
 https.globalAgent.options.rejectUnauthorized = false;
@@ -30,11 +33,16 @@ app.use((err: any, _req: any, res: any, _next: any) => {
     error: err,
   });
 });
+
 app.use('/sync', syncRouter)
 app.use('/push', pushRouter)
 app.use('/hotfix', hotfixRouter)
 app.use('/count', countRouter)
 app.use('/utils/sign', signRouter)
+app.use('/mail', mailRouter)
+app.use('/remove', removeFieldsRouter)
+
+ensureDir('data/template/')
 app.listen(process.env.PORT, async () => {
   console.log(`Server is up! http://0.0.0.0:${process.env.PORT}`);
 })

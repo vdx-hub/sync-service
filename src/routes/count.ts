@@ -1,4 +1,3 @@
-import { _client } from '@db/mongodb';
 import express from 'express';
 import { verify } from 'service/auth/jwt';
 import { getSTT } from 'service/sync/count';
