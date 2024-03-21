@@ -21,6 +21,12 @@ router.post('/:db/:collection/:id', async function (req, res) {
     res.status(400).send("Body request missing!")
     return
   }
+  if (body?.removeField?.ThoiHanBaoQuanSanPham == '') {
+    body.removeField = {
+      ...body.removeField,
+      ThoiDiemQuaHan: ""
+    }
+  }
 
   let kq = await _client.db(param.db).collection(param.collection).updateOne({
     _id: new ObjectId(param.id)

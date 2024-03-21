@@ -9,9 +9,12 @@ import hotfixRouter from "@routes/hotfix";
 import removeFieldsRouter from "@routes/remove_field";
 import countRouter from "@routes/count";
 import signRouter from "@routes/sign";
+import baoQuanRouter from "@routes/bao_quan_san_pham";
+import templaterRouter from "@routes/templater";
 import mailRouter from "@routes/mail";
 import { ensureDir } from 'fs-extra';
-
+import { schedule } from "node-cron";
+import { kiemTraQuaHanSanPham } from 'service/cronjob/bao_quan_san_pham';
 
 https.globalAgent.options.rejectUnauthorized = false;
 
@@ -41,8 +44,13 @@ app.use('/count', countRouter)
 app.use('/utils/sign', signRouter)
 app.use('/mail', mailRouter)
 app.use('/remove', removeFieldsRouter)
+app.use('/baoquan', baoQuanRouter)
+app.use('/templater', templaterRouter)
 
 ensureDir('data/template/')
 app.listen(process.env.PORT, async () => {
   console.log(`Server is up! http://0.0.0.0:${process.env.PORT}`);
+  schedule('*/5 * * * *', async () => {
+    await kiemTraQuaHanSanPham()
+  })
 })
