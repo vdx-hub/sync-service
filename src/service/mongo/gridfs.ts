@@ -1,7 +1,5 @@
-import { ok } from 'assert'
 import type { MongoClient } from 'mongodb'
 import { GridFSBucket, ObjectId } from 'mongodb'
-import { Readable } from 'stream'
 
 interface FileUpload {
   db: string
@@ -86,6 +84,13 @@ export async function deleteFileById(mongoClient: MongoClient, { db, bucketName,
   const bucket = new GridFSBucket(mongoClient.db(db), {
     bucketName,
   })
+  if (!fileID) {
+    return {
+      status: 400,
+      msg: "FileID not found"
+    }
+  }
+  console.warn(fileID);
   const cursor = bucket.find({
     _id: new ObjectId(fileID)
   });

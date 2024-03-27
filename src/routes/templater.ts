@@ -34,6 +34,9 @@ router.post('/delete/:id', async function (req, res) {
     res.send(authStatus)
     return;
   }
+  if (!params.id || String(params.id) === 'undefined' || String(params.id).length !== 24) {
+    return res.status(400).send('id not valid')
+  }
   let kq = await deleteFileById(_clientGridFS, {
     db: 'oauth2',
     bucketName: 'TT_ThuTucDVC',

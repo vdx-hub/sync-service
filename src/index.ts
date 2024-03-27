@@ -50,7 +50,7 @@ app.use('/templater', templaterRouter)
 ensureDir('data/template/')
 app.listen(process.env.PORT, async () => {
   console.log(`Server is up! http://0.0.0.0:${process.env.PORT}`);
-  schedule('*/5 * * * *', async () => {
+  schedule('* * * * *', async () => {
     await kiemTraQuaHanSanPham()
   })
 })
