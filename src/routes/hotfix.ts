@@ -4,6 +4,7 @@ import { fixDiaChi } from 'service/hotfix/S_DiaChi';
 import { fixLinhVucNhiemVu, themLinhVucNhiemVu } from 'service/hotfix/linh_vuc_nhiem_vu';
 import { sinhMaSanPham } from 'service/hotfix/ma_san_pham';
 import { fixNgayBanGiaoDot } from 'service/hotfix/ngay_ban_giao_dot_ban_giao';
+import { capNhatTHBQSanPhamTuNhiemVu } from 'service/hotfix/thoi_han_bao_quan_san_pham_nhiem_vu';
 const router = express.Router();
 
 router.post('/ping', async function (_req, res) {
@@ -54,6 +55,16 @@ router.post('/fixNgayBanGiaoDot', async function (req, res) {
     return;
   }
   let kq = await fixNgayBanGiaoDot()
+  res.status(200).send(kq)
+})
+router.post('/fixThoiHanBQSP', async function (req, res) {
+  let body = req?.body
+  const authStatus = await verify(body.token);
+  if (authStatus?.status == 403) {
+    res.send(authStatus)
+    return;
+  }
+  let kq = await capNhatTHBQSanPhamTuNhiemVu()
   res.status(200).send(kq)
 })
 
